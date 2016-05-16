@@ -10,22 +10,21 @@ public class MergeWithSmallerAuxiliaryArray {
     }
 
     private static void merge(Comparable[] a) {
-        int N = a.length;
-        int mid = N / 2;
+        int N = a.length / 2;
 
-        assert isSorted(a, 0, mid - 1);
-        assert isSorted(a, mid, N - 1);
+        assert isSorted(a, 0, N - 1);
+        assert isSorted(a, N, a.length - 1);
 
-        Comparable[] aux = new Comparable[mid];
+        Comparable[] aux = new Comparable[N];
 
-        for (int k = 0; k < mid; k++) {
+        for (int k = 0; k < N; k++) {
             aux[k] = a[k];
         }
 
-        int i = 0, j = mid;
-        for (int k = 0; k < N; k++) {
-            if (i >= mid) a[k] = a[j++];
-            else if (j >= N) a[k] = aux[i++];
+        int i = 0, j = N;
+        for (int k = 0; k < a.length; k++) {
+            if (i > N - 1) a[k] = a[j++];
+            else if (j > a.length - 1) a[k] = aux[i++];
             else if (less(a[j], aux[i])) a[k] = a[j++];
             else a[k] = aux[i++];
         }
