@@ -1,4 +1,4 @@
-package me.txie;
+package leetcode;
 
 /**
  * Merging with smaller auxiliary array.

@@ -1,4 +1,4 @@
-package com.practicalunittesting;
+package testing;
 
 /**
  *
