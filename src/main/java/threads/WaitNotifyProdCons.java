@@ -65,7 +65,7 @@ public class WaitNotifyProdCons {
                     System.out.println("List size now " + list.size());
                     if (done) break;
                 }
-                process(obj); // Outside synch section (could take time)
+                process(obj); // 可能比较耗时，不要放到同步块里
                 // yield();
             }
         }
