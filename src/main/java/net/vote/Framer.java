@@ -1,4 +1,4 @@
-package net;
+package net.vote;
 
 import java.io.IOException;
 import java.io.OutputStream;
