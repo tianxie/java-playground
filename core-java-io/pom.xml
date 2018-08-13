@@ -10,7 +10,7 @@
         <version>0.1</version>
     </parent>
 
-    <artifactId>io</artifactId>
+    <artifactId>core-java-io</artifactId>
     <version>0.1</version>
 
     <dependencies>

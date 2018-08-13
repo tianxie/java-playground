@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>me.txie</groupId>
-    <artifactId>threads</artifactId>
+    <artifactId>core-java-concurrency</artifactId>
     <version>0.1</version>
 
     
