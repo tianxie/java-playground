@@ -18,6 +18,8 @@
         <netty.version>4.0.31.Final</netty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <echo-server.hostname>localhost</echo-server.hostname>
         <echo-server.port>8888</echo-server.port>
     </properties>
