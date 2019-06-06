@@ -8,6 +8,6 @@
 out
 gen
 target/
-spring-data-mongodb/.vscode/
-spring-data-mongodb/bin/
+.vscode/
+bin/
 .mvn/

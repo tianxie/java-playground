@@ -12,7 +12,7 @@ public class WaitNotifyProdCons {
     protected boolean done = false; // Also protected by lock on list.
 
     class Producer extends Thread {
-	
+
         public void run() {
             while (true) {
                 Object justProduced = getRequestFromNetwork();
