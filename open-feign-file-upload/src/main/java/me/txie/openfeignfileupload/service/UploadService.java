@@ -14,8 +14,8 @@ public class UploadService {
     @Autowired
     private UploadClient client;
 
-    public String uploadFile(MultipartFile file) {
-        return client.fileUpload(file);
+    public String uploadFile(String name, MultipartFile file) {
+        return client.fileUpload(name, file);
     }
 
     public boolean uploadFileWithManualClient(MultipartFile file) {

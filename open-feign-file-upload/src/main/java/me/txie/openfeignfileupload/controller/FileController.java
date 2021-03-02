@@ -14,8 +14,8 @@ public class FileController {
     private UploadService service;
 
     @PostMapping(value = "/upload")
-    public String handleFileUpload(@RequestPart(value = "file") MultipartFile file) {
-        return service.uploadFile(file);
+    public String handleFileUpload(@RequestPart(value = "name") String name, @RequestPart(value = "file") MultipartFile file) {
+        return service.uploadFile(name, file);
     }
 
     @PostMapping(value = "/upload-manual-client")

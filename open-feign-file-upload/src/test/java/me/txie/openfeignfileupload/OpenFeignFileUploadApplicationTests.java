@@ -32,7 +32,7 @@ class OpenFeignFileUploadApplicationTests {
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",
                 IOUtils.toByteArray(input));
-        String uploadFile = uploadService.uploadFile(multipartFile);
+        String uploadFile = uploadService.uploadFile(FILE_NAME, multipartFile);
         Assert.assertNotNull(uploadFile);
     }
 
