@@ -1,0 +1,158 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-manager-deployment
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-bookmanage-dev-book-manager
+spec:
+  selector:
+    matchLabels:
+      octopusexport: OctopusExport
+  revisionHistoryLimit: 10
+  replicas: 1
+  progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-bookmanage-dev-book-manager
+        octopusexport: OctopusExport
+    spec:
+      dnsPolicy: ClusterFirst
+      hostNetwork: false
+      volumes:
+        - name: filebeat
+          configMap:
+            name: filebeat
+            items:
+              - key: filebeat.yml
+                path: filebeat.yml
+        - name: logs
+          emptyDir: { }
+        - name: inputs
+          configMap:
+            name: inputs
+      containers:
+        - name: book-manager
+          image: harbor.rdpdev0.paasdev.zoomlion.com/book/book-manager:dev_157a754
+          imagePullPolicy: Always
+          command:
+            - java
+            - '-Djava.security.egd=file:/dev/./urandom'
+            - '-Dskywalking.trace.ignore_path=/eureka/**'
+            - '-Dskywalking.agent.namespace=agpro-dev'
+            - '-javaagent:/agent/skywalking-agent.jar'
+            - '-Dlogback.configurationFile=logback.xml'
+            - '-jar'
+            - '-Xms256m'
+            - '-Xmx512m'
+            - /app.jar
+            - '--app.id=bookmanage-book-manager'
+            - '--apollo.meta=http://172.10.30.92:8080'
+            - '--env=DEV'
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SW_AGENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SW_AGENT_COLLECTOR_BACKEND_SERVICES
+              value: '10.39.61.92:11800,10.39.61.93:11800,10.39.61.94:11800'
+            - name: ZVOS_PRJ_NAME
+              value: bookmanage
+            - name: ZVOS_PRJ_ENV
+              value: dev
+            - name: ZVOS_PRJ_SRV_NAME
+              value: book-manager
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+              subPath: ''
+        - name: filebeat
+          image: harbor.rdpdev0.paasdev.zoomlion.com/elastic/filebeat:7.10.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - '-c'
+            - /usr/share/filebeat/conf/filebeat.yml
+            - '-e'
+          env:
+            - name: ZVOS_PRJ_ENV
+              value: dev
+            - name: ZVOS_PRJ_NAME
+              value: bookmanage
+            - name: ZVOS_PRJ_SRV_NAME
+              value: book-manager
+          volumeMounts:
+            - name: inputs
+              mountPath: /usr/share/filebeat/conf/inputs.d
+              subPath: ''
+            - name: filebeat
+              mountPath: /usr/share/filebeat/conf
+              subPath: ''
+            - name: logs
+              mountPath: /logs
+              subPath: ''
+---
+apiVersion: v1
+data:
+  filebeat.yml: |-
+    filebeat.config.inputs:
+      enabled: true
+      path: conf/inputs.d/*.yml
+      reload.enabled: true
+      reload.period: 2s
+    output.kafka:
+      hosts: ["10.67.1.148:9092"]
+      topic: 'micro-%{[fields.kafka_topics]}-log-%{[fields.environment_name]}'
+      partition.hash:
+        reachable_only: false
+kind: ConfigMap
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: filebeat
+---
+apiVersion: v1
+data:
+  api-input.yml: |-
+    - type: log
+      paths:
+        - /logs/api/*.log
+      fields:
+        kafka_topics: api
+        environment_name: '${ZVOS_PRJ_ENV}'
+        project_name: '${ZVOS_PRJ_NAME}'
+        service_name: '${ZVOS_PRJ_SRV_NAME}'
+        pod_name: '${HOSTNAME}'
+      json.keys_under_root: true
+  jvm-input.yml: |-
+    - type: log
+      enabled: true
+      paths:
+        - /logs/jvm/*.log
+      fields:
+        kafka_topics: jvm
+        environment_name: '${ZVOS_PRJ_ENV}'
+        project_name: '${ZVOS_PRJ_NAME}'
+        service_name: '${ZVOS_PRJ_SRV_NAME}'
+        pod_name: '${HOSTNAME}'
+      json.keys_under_root: true
+  log-input.yml: |-
+    - type: log
+      enabled: true
+      paths:
+        - /logs/app/*.log
+      fields:
+        kafka_topics: app
+        environment_name: '${ZVOS_PRJ_ENV}'
+        project_name: '${ZVOS_PRJ_NAME}'
+        service_name: '${ZVOS_PRJ_SRV_NAME}'
+        pod_name: '${HOSTNAME}'
+      json.keys_under_root: true
+kind: ConfigMap
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: inputs
