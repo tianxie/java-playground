@@ -6,7 +6,7 @@ import io.kubernetes.client.util.Config;
 
 import java.io.IOException;
 
-public class Main {
+public class ListNodes {
     public static void main(String[] args) throws IOException, ApiException {
         // 初始化 ApiClient
         ApiClient client = Config.defaultClient();
